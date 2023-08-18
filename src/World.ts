@@ -10,7 +10,7 @@ export class World
     private blockSize: number;
     private noise: SimplexNoise;
 
-    constructor(chunkSize: number = 4, chunkFromCamera: number = 20, blockSize: number = 1) {
+    constructor(chunkSize: number = 8, chunkFromCamera: number = 12, blockSize: number = 1) {
         this.chunks = [];
         this.chunkSize = chunkSize;
         this.chunkFromCamera = chunkFromCamera;
@@ -19,8 +19,11 @@ export class World
     }
 
     update(scene: BABYLON.Scene, camera: BABYLON.Camera) {
-        this.clearTooFarChunks(scene, camera);
-        this.populateMissingChunks(scene, camera);
+        if (this.populateMissingChunks(scene, camera)) {
+            scene.blockfreeActiveMeshesAndRenderingGroups = true;
+            this.clearTooFarChunks(scene, camera);
+            scene.blockfreeActiveMeshesAndRenderingGroups = false;
+        }
     }
 
     clearTooFarChunks(scene: BABYLON.Scene, camera: BABYLON.Camera) {
@@ -33,6 +36,7 @@ export class World
                 || Math.abs(cameraPosition2d.y - chunk.getPosition().y) > maxDistance
             ) {
                 chunk.dispose();
+
                 return false;
             }
 
@@ -41,6 +45,8 @@ export class World
     }
 
     populateMissingChunks(scene: BABYLON.Scene, camera: BABYLON.Camera) {
+        let newChunks = false;
+
         let cameraChunkPosition = new BABYLON.Vector2(
             Math.floor(camera.position.x / (this.chunkSize * this.blockSize)),
             Math.floor(camera.position.z / (this.chunkSize * this.blockSize)),
@@ -52,9 +58,14 @@ export class World
                     (cameraChunkPosition.x + i) * this.chunkSize * this.blockSize,
                     (cameraChunkPosition.y + j) * this.chunkSize * this.blockSize,
                 );
-                this.createChunk(scene, chunkPosition);
+
+                if (this.createChunk(scene, chunkPosition)) {
+                    newChunks = true;
+                }
             }
         }
+
+        return newChunks;
     }
 
     createChunk(scene: BABYLON.Scene, chunkPosition: BABYLON.Vector2) {
@@ -62,7 +73,11 @@ export class World
             let chunk = new Chunk(this.chunkSize, chunkPosition, this.blockSize);
             chunk.generate(scene, this.noise);
             this.chunks.push(chunk);
+
+            return true;
         }
+
+        return false;
     }
 
     hasChunk(chunkPosition: BABYLON.Vector2) {

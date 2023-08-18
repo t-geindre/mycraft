@@ -10,7 +10,14 @@ document.getElementsByTagName("body")[0].appendChild(canvas);
 
 // Engine & scene creation
 let engine = new BABYLON.Engine(canvas, true);
-let scene = new BABYLON.Scene(engine);
+let scene = new BABYLON.Scene(engine, {
+    // Options to speed up add/remove mesh from scene
+    // see https://doc.babylonjs.com/features/featuresDeepDive/scene/optimize_your_scene#reducing-draw-calls
+    useGeometryUniqueIdsMap: true,
+    useMaterialMeshMap: true,
+    useClonedMeshMap: true,
+
+});
 scene.clearColor = new BABYLON.Color4(.8, .8, 1, 1);
 
 // Camera & light
