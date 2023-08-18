@@ -20,7 +20,7 @@ export class Water implements Block {
 
     spawnAt(scene: BABYLON.Scene, size: number, position: BABYLON.Vector3): BABYLON.Mesh {
         let block = this.spawn(scene, size);
-        block.position = position;
+        block.position = new BABYLON.Vector3(position.x, position.y + size / 2, position.z);
 
         return block;
     }

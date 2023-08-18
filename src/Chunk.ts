@@ -37,6 +37,9 @@ export class Chunk
                         this.blockSize,
                         new BABYLON.Vector3(position.x, -5, position.z)
                     ));
+                    this.blocks.push(Blocks.sand.spawnAt(scene, this.blockSize, position));
+
+                    continue;
                 }
 
                 this.blocks.push(Blocks.grass.spawnAt(scene, this.blockSize, position));
