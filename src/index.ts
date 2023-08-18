@@ -1,24 +1,33 @@
-import Engine from "./Engine/Engine";
-import Explosion from "./Effect/Explosion";
-import Triangle from "./Ship/Triangle";
+import * as BABYLON from 'babylonjs';
+import {Materials, loadMaterials} from './Material';
+import {World} from './World';
 
-const engine = new Engine();
+// Canvas creation
+let canvas = document.createElement("canvas");
+canvas.style.width = "100%";
+canvas.style.height = "100%";
+document.getElementsByTagName("body")[0].appendChild(canvas);
 
-engine.canvas.width = 1600;
-engine.canvas.height = 800;
 
-let colors = [
-    "#FF0000",
-    "#00FF00",
-    "#0000FF",
-    "#f13cff",
-    "#fff14d",
-];
-engine.canvas.addEventListener("click", (event: MouseEvent) => {
-    let color = colors[Math.floor(Math.random() * colors.length)];
-    new Explosion(engine, event.offsetX, event.offsetY, color, 1000);
+// Engine & scene creation
+let engine = new BABYLON.Engine(canvas, true);
+let scene = new BABYLON.Scene(engine);
+scene.clearColor = new BABYLON.Color4(.8, .8, 1, 1);
+
+// Load all required materials (potential load screen)
+loadMaterials(scene);
+
+// Camera & light
+new BABYLON.HemisphericLight("light", new BABYLON.Vector3(0, 10, 0), scene);
+let camera = new BABYLON.FreeCamera("camera1", new BABYLON.Vector3(0, 2, -10), scene);
+camera.attachControl(canvas, true);
+camera.setTarget(new BABYLON.Vector3(0, 2, 0));
+
+// World creation
+let world = new World();
+
+// Main rendering loop
+engine.runRenderLoop(function() {
+    world.update(scene, camera);
+    scene.render();
 });
-
-engine.drawPool.add(new Triangle());
-
-engine.run();
