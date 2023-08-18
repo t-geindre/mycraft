@@ -15,7 +15,7 @@ export class Sand implements Block {
             this.init(scene);
         }
 
-        let block = BABYLON.CreateBox('grass_block', {size});
+        let block = BABYLON.CreateBox('sand_block', {size});
         block.material = this.material;
 
         return  block;

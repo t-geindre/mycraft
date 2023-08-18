@@ -1,6 +1,7 @@
 import * as BABYLON from 'babylonjs';
 import {SimplexNoise} from "ts-perlin-simplex";
 import {Blocks} from "./Block";
+import {Block} from "./Block/Block";
 
 export class Chunk
 {
@@ -31,18 +32,16 @@ export class Chunk
 
                 position.y = Math.ceil(noise.noise(position.x / 100, position.z / 100) * 10) * this.blockSize
 
+                let groundSpawner : Block = Blocks.grass;
+
                 if (position.y < -5) {
+                    groundSpawner = Blocks.sand;
                     this.blocks.push(Blocks.water.spawnAt(
                         scene,
                         this.blockSize,
                         new BABYLON.Vector3(position.x, -5, position.z)
                     ));
-                    this.blocks.push(Blocks.sand.spawnAt(scene, this.blockSize, position));
-
-                    continue;
                 }
-
-                this.blocks.push(Blocks.grass.spawnAt(scene, this.blockSize, position));
             }
         }
     }
