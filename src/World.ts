@@ -1,5 +1,6 @@
 import {Chunk} from "./Chunk";
 import * as BABYLON from 'babylonjs';
+import {SimplexNoise} from "ts-perlin-simplex";
 
 export class World
 {
@@ -7,12 +8,14 @@ export class World
     private chunkSize: number;
     private chunkFromCamera: number;
     private blockSize: number;
+    private noise: SimplexNoise;
 
-    constructor(chunkSize: number = 8, chunkFromCamera: number = 8, blockSize: number = 1) {
+    constructor(chunkSize: number = 4, chunkFromCamera: number = 16, blockSize: number = 1) {
         this.chunks = [];
         this.chunkSize = chunkSize;
         this.chunkFromCamera = chunkFromCamera;
         this.blockSize = blockSize;
+        this.noise = new SimplexNoise();
     }
 
     update(scene: BABYLON.Scene, camera: BABYLON.Camera) {
@@ -57,7 +60,7 @@ export class World
     createChunk(scene: BABYLON.Scene, chunkPosition: BABYLON.Vector2) {
         if (!this.hasChunk(chunkPosition)) {
             let chunk = new Chunk(this.chunkSize, chunkPosition, this.blockSize);
-            chunk.generate(scene);
+            chunk.generate(scene, this.noise);
             this.chunks.push(chunk);
         }
     }

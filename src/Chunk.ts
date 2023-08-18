@@ -1,4 +1,6 @@
 import * as BABYLON from 'babylonjs';
+import {SimplexNoise} from "ts-perlin-simplex";
+import {Blocks} from "./Block";
 
 export class Chunk
 {
@@ -18,22 +20,26 @@ export class Chunk
         return this.chunkPosition;
     }
 
-    public generate(scene: BABYLON.Scene) {
-        console.log("Generating chunk");
+    public generate(scene: BABYLON.Scene, noise: SimplexNoise) {
         for (let j = 0; j < this.chunkSize; j++) {
             for (let i = 0; i < this.chunkSize; i++) {
-                let type = ["grass", "water"][Math.floor(Math.random() * 2)];
+                let position = new BABYLON.Vector3(
+                    this.chunkPosition.x + i * this.blockSize,
+                    0,
+                    this.chunkPosition.y + j * this.blockSize,
+                );
 
-                let block;
-                //    block = BABYLON.CreatePlane("plane", {size: this.blockSize}, scene);
-                block = BABYLON.CreateBox("box", {size: this.blockSize}, scene);
+                position.y = Math.ceil(noise.noise(position.x / 100, position.z / 100) * 10) * this.blockSize
 
-                block.position.x = this.chunkPosition.x + i * this.blockSize;
-                block.position.z = this.chunkPosition.y + j * this.blockSize;
-                block.position.y = 0;
-                block.material = scene.getMaterialByName(type);
+                if (position.y < -5) {
+                    this.blocks.push(Blocks.water.spawnAt(
+                        scene,
+                        this.blockSize,
+                        new BABYLON.Vector3(position.x, -5, position.z)
+                    ));
+                }
 
-                this.blocks.push(block);
+                this.blocks.push(Blocks.grass.spawnAt(scene, this.blockSize, position));
             }
         }
     }

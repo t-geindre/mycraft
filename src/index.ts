@@ -1,5 +1,4 @@
 import * as BABYLON from 'babylonjs';
-import {Materials, loadMaterials} from './Material';
 import {World} from './World';
 
 // Canvas creation
@@ -14,9 +13,6 @@ let engine = new BABYLON.Engine(canvas, true);
 let scene = new BABYLON.Scene(engine);
 scene.clearColor = new BABYLON.Color4(.8, .8, 1, 1);
 
-// Load all required materials (potential load screen)
-loadMaterials(scene);
-
 // Camera & light
 new BABYLON.HemisphericLight("light", new BABYLON.Vector3(0, 10, 0), scene);
 let camera = new BABYLON.FreeCamera("camera1", new BABYLON.Vector3(0, 2, -10), scene);
@@ -28,6 +24,6 @@ let world = new World();
 
 // Main rendering loop
 engine.runRenderLoop(function() {
-    world.update(scene, camera);
+   world.update(scene, camera);
     scene.render();
 });
