@@ -10,7 +10,7 @@ export class World
     private blockSize: number;
     private noise: SimplexNoise;
 
-    constructor(chunkSize: number = 8, chunkFromCamera: number = 12, blockSize: number = 1) {
+    constructor(chunkSize: number = 8, chunkFromCamera: number = 16, blockSize: number = 1) {
         this.chunks = [];
         this.chunkSize = chunkSize;
         this.chunkFromCamera = chunkFromCamera;
