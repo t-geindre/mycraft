@@ -14,14 +14,10 @@ export class Grass implements Block {
 
     private material: BABYLON.StandardMaterial = null;
 
-    init(scene: BABYLON.Scene): void {
-        this.material = new BABYLON.StandardMaterial("block_grass", scene);
-        this.material.diffuseTexture = new BABYLON.Texture(require('../../assets/grass.png'), scene);
-    }
-
     spawn(scene: BABYLON.Scene, size: number): BABYLON.Mesh {
         if (this.material === null) {
-            this.init(scene);
+            this.material = new BABYLON.StandardMaterial("block_grass", scene);
+            this.material.diffuseTexture = new BABYLON.Texture(require('../../assets/grass.png'), scene);
         }
 
         let block = BABYLON.CreateBox('grass_block', {size, faceUV: this.faceUV});
