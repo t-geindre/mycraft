@@ -6,10 +6,11 @@ export class ElevationGenerator
     private noise: SimplexNoise;
 
     private spline = [
+        // { from: -1, to: 1, evol: [0, 0] },
         { from: -1, to: -.8, evol: [-10, -10] },
         { from: -.8, to: .7, evol: [-10, 20] },
-        { from: .7, to: .9, evol: [20, 30] },
-        { from: .9, to: 1, evol: [30, 50] },
+        { from: .7, to: .99, evol: [20, 40] },
+        { from: .99, to: 1, evol: [40, 50] },
     ];
 
     constructor() {

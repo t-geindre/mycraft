@@ -2,25 +2,50 @@ import * as BABYLON from 'babylonjs';
 
 export abstract class BlockSpawner {
     private sourceBlock: BABYLON.Mesh = null;
+    private firstPositionSet: boolean = false;
+    private matrix: BABYLON.Matrix[] = [];
 
     protected abstract getSourceBlock(scene: BABYLON.Scene, size: number): BABYLON.Mesh;
 
-    public spawn(scene: BABYLON.Scene, size: number, position: BABYLON.Vector3): BABYLON.AbstractMesh
+    public start(scene: BABYLON.Scene, size: number)
     {
-        if (this.sourceBlock === null) {
-            this.sourceBlock = this.getSourceBlock(scene, size);
-            this.sourceBlock.isVisible = false;
+        this.sourceBlock = this.getSourceBlock(scene, size);
+        this.firstPositionSet = false;
+        this.matrix = [];
+
+        return this;
+    }
+
+    public spawn(position: BABYLON.Vector3)
+    {
+        if (!this.firstPositionSet) {
+            this.sourceBlock.position = position;
+            this.firstPositionSet = true;
         }
 
-        let block = this.sourceBlock.createInstance('block');
-        block.position = position;
+        let matrix = this.sourceBlock.getWorldMatrix().clone();
+        this.matrix.push(BABYLON.Matrix.Translation(
+            position.x - this.sourceBlock.position.x,
+            position.y - this.sourceBlock.position.y,
+            position.z - this.sourceBlock.position.z,
+        ));
+    }
 
-        // Optimization: only check block bounding box when rendering
-        block.cullingStrategy = BABYLON.AbstractMesh.CULLINGSTRATEGY_BOUNDINGSPHERE_ONLY;
+    public flush(): BABYLON.Mesh | null
+    {
 
-        // Optimization: freeze world matrix to improve performance
-        block.freezeWorldMatrix();
+        if (this.matrix.length > 0) {
+            this.sourceBlock.thinInstanceAdd(this.matrix);
 
-        return block;
+            return this.sourceBlock;
+        }
+
+        if (!this.firstPositionSet) {
+            this.sourceBlock.dispose();
+
+            return null;
+        }
+
+        return this.sourceBlock;
     }
 }

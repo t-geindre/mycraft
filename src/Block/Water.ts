@@ -10,8 +10,7 @@ export class Water extends BlockSpawner
         material.alpha = .5;
         material.freeze();
 
-        let block = BABYLON.CreatePlane("plane", {size}, scene);
-        block.rotation.x = BABYLON.Tools.ToRadians(90);
+        let block = BABYLON.CreateGround("plane", {width: size, height: 1}, scene);
         block.material = material;
 
         return block;

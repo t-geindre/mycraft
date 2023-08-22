@@ -10,7 +10,7 @@ export class World
     private blockSize: number;
     private elevationGenerator: ElevationGenerator;
 
-    constructor(chunkSize: number = 8, chunkFromCamera: number = 10, blockSize: number = 1) {
+    constructor(chunkSize: number = 64, chunkFromCamera: number = 5, blockSize: number = 1) {
         this.chunks = [];
         this.chunkSize = chunkSize;
         this.chunkFromCamera = chunkFromCamera;

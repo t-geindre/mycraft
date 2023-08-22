@@ -22,6 +22,14 @@ export class Chunk
     }
 
     public generate(scene: BABYLON.Scene, elevatioGenerator: ElevationGenerator) {
+        // Biome config
+        let biomeBlockSpawners = {
+            ground: Blocks.grass.start(scene, this.blockSize),
+            underground: Blocks.dirt.start(scene, this.blockSize),
+            water: Blocks.water.start(scene, this.blockSize),
+            underwater: Blocks.sand.start(scene, this.blockSize),
+        };
+
         for (let j = 0; j < this.chunkSize; j++) {
             for (let i = 0; i < this.chunkSize; i++) {
                 let position = new BABYLON.Vector2(
@@ -30,29 +38,34 @@ export class Chunk
                 );
 
                 let blockPosition = elevatioGenerator.getAt(position);
-                blockPosition.y * this.blockSize;
+                blockPosition.y = blockPosition.y * this.blockSize;
 
-                let groundSpawner : BlockSpawner = Blocks.grass;
+                let groundSpawner : BlockSpawner = biomeBlockSpawners.ground;
 
                 if (blockPosition.y < -5) {
-                    groundSpawner = Blocks.sand;
-                    this.blocks.push(Blocks.water.spawn(
-                        scene,
-                        this.blockSize,
-                        new BABYLON.Vector3(blockPosition.x, -5, blockPosition.z)
-                    ));
+                    groundSpawner = biomeBlockSpawners.underwater;
+                    biomeBlockSpawners.water.spawn(new BABYLON.Vector3(blockPosition.x, -5, blockPosition.z));
                 }
+                groundSpawner.spawn(blockPosition);
 
-                this.blocks.push(groundSpawner.spawn(scene, this.blockSize, blockPosition));
-                blockPosition.y -= this.blockSize;
-                this.blocks.push(Blocks.dirt.spawn(scene, this.blockSize, blockPosition));
+                for (let k = 0; k < 2; k++) {
+                    blockPosition.y -= this.blockSize;
+                    biomeBlockSpawners.underground.spawn(blockPosition);
+                }
             }
         }
+
+        this.blocks.push(biomeBlockSpawners.ground.flush());
+        this.blocks.push(biomeBlockSpawners.underground.flush());
+        this.blocks.push(biomeBlockSpawners.water.flush());
+        this.blocks.push(biomeBlockSpawners.underwater.flush());
     }
 
     public dispose() {
-        this.blocks.forEach(function(block) {5
-            block.dispose();
+        this.blocks.forEach(function(block) {
+            if (block !== null) {
+                block.dispose();
+            }
         });
     }
 }

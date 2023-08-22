@@ -32,7 +32,5 @@ camera.setTarget(new BABYLON.Vector3(0, 5, 0));
 let world = new World();
 
 // Main rendering loop
-engine.runRenderLoop(function() {
-   world.update(scene, camera);
-    scene.render();
-});
+scene.onBeforeRenderObservable.add(() => world.update(scene, camera));
+engine.runRenderLoop(() => scene.render());
