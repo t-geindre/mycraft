@@ -23,7 +23,6 @@ export abstract class BlockSpawner {
             this.firstPositionSet = true;
         }
 
-        let matrix = this.sourceBlock.getWorldMatrix().clone();
         this.matrix.push(BABYLON.Matrix.Translation(
             position.x - this.sourceBlock.position.x,
             position.y - this.sourceBlock.position.y,

@@ -46,9 +46,9 @@ export class Chunk
                     groundSpawner = biomeBlockSpawners.underwater;
                     biomeBlockSpawners.water.spawn(new BABYLON.Vector3(blockPosition.x, -5, blockPosition.z));
                 }
-                groundSpawner.spawn(blockPosition);
+                groundSpawner.spawn(blockPosition.clone());
 
-                for (let k = 0; k < 2; k++) {
+                for (let k = 0; k < 3; k++) {
                     blockPosition.y -= this.blockSize;
                     biomeBlockSpawners.underground.spawn(blockPosition);
                 }

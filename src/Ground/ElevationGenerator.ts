@@ -3,25 +3,38 @@ import {SimplexNoise} from "ts-perlin-simplex";
 
 export class ElevationGenerator
 {
-    private noise: SimplexNoise;
+    private noiseOctOne: SimplexNoise;
+    private noiseOctTwo: SimplexNoise;
+    private noiseOctThree: SimplexNoise;
 
     private spline = [
-        // { from: -1, to: 1, evol: [0, 0] },
-        { from: -1, to: -.8, evol: [-10, -10] },
-        { from: -.8, to: .7, evol: [-10, 20] },
-        { from: .7, to: .99, evol: [20, 40] },
-        { from: .99, to: 1, evol: [40, 50] },
+        { from: -1, to: 1, evol: [-20, 100] },
+        { from: -1, to: 1, evol: [-20, 100] },
+        { from: -1, to: .3, evol: [-20, 100] },
+        { from: .3, to: .4, evol: [100, 120] },
+        { from: .4, to: 1, evol: [120, 120] },
     ];
 
     constructor() {
-        this.noise = new SimplexNoise();
+        this.noiseOctOne = new SimplexNoise()
+        this.noiseOctTwo = new SimplexNoise()
+        this.noiseOctThree = new SimplexNoise()
+    }
+
+    private getNoise(x: number, y: number) {
+        let noise = this.noiseOctOne.noise(x / 300, y / 300);
+        // noise += this.noiseOctOne.noise(x / 100, y / 100) * .1;
+        // noise += this.noiseOctOne.noise(x / 1000, y / 1000) * .2;
+        noise += this.noiseOctOne.noise(x / 20, y / 20) * .02;
+        noise += this.noiseOctOne.noise(x / 100, y / 100) * .1;
+
+        return Math.max(-1, Math.min(noise, 1));
     }
 
     getAt(position: BABYLON.Vector2): BABYLON.Vector3
     {
         // divide position smooth the terrain
-        let height = this.noise.noise(position.x / 100, position.y / 100);
-
+        let height = this.getNoise(position.x, position.y);
 
         // apply spline points
         let spline = this.spline.find(
