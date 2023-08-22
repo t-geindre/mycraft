@@ -1,7 +1,7 @@
 import * as BABYLON from 'babylonjs';
-import {SimplexNoise} from "ts-perlin-simplex";
 import {Blocks} from "./Block";
 import {BlockSpawner} from "./Block/BlockSpawner";
+import {ElevationGenerator} from "./Ground/ElevationGenerator";
 
 export class Chunk
 {
@@ -21,29 +21,31 @@ export class Chunk
         return this.chunkPosition;
     }
 
-    public generate(scene: BABYLON.Scene, noise: SimplexNoise) {
+    public generate(scene: BABYLON.Scene, elevatioGenerator: ElevationGenerator) {
         for (let j = 0; j < this.chunkSize; j++) {
             for (let i = 0; i < this.chunkSize; i++) {
-                let position = new BABYLON.Vector3(
+                let position = new BABYLON.Vector2(
                     this.chunkPosition.x + i * this.blockSize,
-                    0,
                     this.chunkPosition.y + j * this.blockSize,
                 );
 
-                position.y = Math.ceil(noise.noise(position.x / 100, position.z / 100) * 10) * this.blockSize
+                let blockPosition = elevatioGenerator.getAt(position);
+                blockPosition.y * this.blockSize;
 
                 let groundSpawner : BlockSpawner = Blocks.grass;
 
-                if (position.y < -5) {
+                if (blockPosition.y < -5) {
                     groundSpawner = Blocks.sand;
                     this.blocks.push(Blocks.water.spawn(
                         scene,
                         this.blockSize,
-                        new BABYLON.Vector3(position.x, -5, position.z)
+                        new BABYLON.Vector3(blockPosition.x, -5, blockPosition.z)
                     ));
                 }
 
-                this.blocks.push(groundSpawner.spawn(scene, this.blockSize, position));
+                this.blocks.push(groundSpawner.spawn(scene, this.blockSize, blockPosition));
+                blockPosition.y -= this.blockSize;
+                this.blocks.push(Blocks.dirt.spawn(scene, this.blockSize, blockPosition));
             }
         }
     }
