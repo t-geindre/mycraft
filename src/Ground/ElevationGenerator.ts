@@ -9,8 +9,9 @@ export class ElevationGenerator
     private spline = [
         // { from: -1, to: 1, evol: [50, 180] },
         { from: -1, to: .3, evol: [50, 100] },
-        { from: .3, to: .4, evol: [100, 110] },
-        { from: .4, to: 1, evol: [110, 180] },
+        { from: .3, to: .6, evol: [100, 110] },
+        { from: .6, to: .8, evol: [110, 140] },
+        { from: .8, to: 1, evol: [140, 200] },
     ];
 /*
         { from: -1, to: .3, evol: [50, 100] },
