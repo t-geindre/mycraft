@@ -59,6 +59,6 @@ scene.onBeforeRenderObservable.add(() => {
     camera.rotation.y += BABYLON.Tools.ToRadians(Math.sin(camera.position.x / 100));
     scene.activeCamera.position.y += (elevationGenerator.getAt(
         new BABYLON.Vector2(scene.activeCamera.globalPosition.x, scene.activeCamera.globalPosition.z)
-    ).y - scene.activeCamera.position.y + 30) * .05;
+    ).y - scene.activeCamera.position.y + 40) * .05;
 });
 engine.runRenderLoop(() => scene.render());
