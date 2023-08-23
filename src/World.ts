@@ -10,12 +10,12 @@ export class World
     private blockSize: number;
     private elevationGenerator: ElevationGenerator;
 
-    constructor(chunkSize: number = 64, chunkFromCamera: number = 5, blockSize: number = 1) {
+    constructor(elevationGenerator: ElevationGenerator, chunkSize: number = 64, chunkFromCamera: number = 8, blockSize: number = 1) {
         this.chunks = [];
         this.chunkSize = chunkSize;
         this.chunkFromCamera = chunkFromCamera;
         this.blockSize = blockSize;
-        this.elevationGenerator = new ElevationGenerator();
+        this.elevationGenerator = elevationGenerator;
     }
 
     update(scene: BABYLON.Scene, camera: BABYLON.Camera) {

@@ -3,30 +3,38 @@ import {SimplexNoise} from "ts-perlin-simplex";
 
 export class ElevationGenerator
 {
-    private noiseOctOne: SimplexNoise;
-    private noiseOctTwo: SimplexNoise;
-    private noiseOctThree: SimplexNoise;
+    private noise: SimplexNoise;
+    private erosionNoise: SimplexNoise;
 
     private spline = [
-        { from: -1, to: 1, evol: [-20, 100] },
-        { from: -1, to: 1, evol: [-20, 100] },
-        { from: -1, to: .3, evol: [-20, 100] },
-        { from: .3, to: .4, evol: [100, 120] },
-        { from: .4, to: 1, evol: [120, 120] },
+        // { from: -1, to: 1, evol: [50, 180] },
+        { from: -1, to: .3, evol: [50, 100] },
+        { from: .3, to: .4, evol: [100, 110] },
+        { from: .4, to: 1, evol: [110, 180] },
     ];
+/*
+        { from: -1, to: .3, evol: [50, 100] },
+        { from: .3, to: .4, evol: [100, 150] },
+        { from: .4, to: 1, evol: [150, 150] },
+
+    [-1,0.3] => [50,100],
+    [0.3,0.4] => [100, 150],
+    [0.4,1] => [150,150]
+*/
+    getWaterLevel(): number
+    {
+        return 80;
+    }
 
     constructor() {
-        this.noiseOctOne = new SimplexNoise()
-        this.noiseOctTwo = new SimplexNoise()
-        this.noiseOctThree = new SimplexNoise()
+        this.noise = new SimplexNoise();
+        this.erosionNoise = new SimplexNoise();
     }
 
     private getNoise(x: number, y: number) {
-        let noise = this.noiseOctOne.noise(x / 300, y / 300);
-        // noise += this.noiseOctOne.noise(x / 100, y / 100) * .1;
-        // noise += this.noiseOctOne.noise(x / 1000, y / 1000) * .2;
-        noise += this.noiseOctOne.noise(x / 20, y / 20) * .02;
-        noise += this.noiseOctOne.noise(x / 100, y / 100) * .1;
+        let noise = this.noise.noise(x / 1000, y / 1000);
+        noise += this.noise.noise(x / 20, y / 20) * .02;
+        noise += this.noise.noise(x / 100, y / 100) * .1;
 
         return Math.max(-1, Math.min(noise, 1));
     }

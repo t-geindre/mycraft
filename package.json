@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "babylonjs": "^6.16.1",
+    "babylonjs-materials": "^6.17.0",
     "ts-perlin-simplex": "^0.0.3",
     "webpack-dev-server": "^4.15.1"
   }

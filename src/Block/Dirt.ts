@@ -3,23 +3,30 @@ import {BlockSpawner} from "./BlockSpawner";
 
 export class Dirt extends BlockSpawner
 {
+    private material: BABYLON.StandardMaterial;
+    private faceUV: BABYLON.Vector4[];
+
     protected getSourceBlock(scene: BABYLON.Scene, size: number): BABYLON.Mesh
     {
-        let  faceUV = [
-            new BABYLON.Vector4(5 / 6, 0, 4 / 6, 1), // Use the bottom face of dirt texture
-            new BABYLON.Vector4(5 / 6, 0, 4 / 6, 1),
-            new BABYLON.Vector4(5 / 6, 0, 4 / 6, 1),
-            new BABYLON.Vector4(5 / 6, 0, 4 / 6, 1),
-            new BABYLON.Vector4(5 / 6, 0, 4 / 6, 1),
-            new BABYLON.Vector4(5 / 6, 0, 4 / 6, 1),
-        ];
+        if (!this.faceUV) {
+            this.faceUV = [
+                new BABYLON.Vector4(5 / 6, 0, 4 / 6, 1), // Use the bottom face of dirt texture
+                new BABYLON.Vector4(5 / 6, 0, 4 / 6, 1),
+                new BABYLON.Vector4(5 / 6, 0, 4 / 6, 1),
+                new BABYLON.Vector4(5 / 6, 0, 4 / 6, 1),
+                new BABYLON.Vector4(5 / 6, 0, 4 / 6, 1),
+                new BABYLON.Vector4(5 / 6, 0, 4 / 6, 1),
+            ];
+        }
 
-        let material = new BABYLON.StandardMaterial("block_dirt", scene);
-        material.diffuseTexture = new BABYLON.Texture(require('../../assets/grass.png'), scene);
-        material.freeze();
+        if (!this.material) {
+            this.material = new BABYLON.StandardMaterial("block_dirt", scene);
+            this.material.diffuseTexture = new BABYLON.Texture(require('../../assets/grass.png'), scene);
+            this.material.freeze();
+        }
 
-        let block = BABYLON.CreateBox('block_dirt', {size, faceUV});
-        block.material = material;
+        let block = BABYLON.CreateBox('block_dirt', {size, faceUV: this.faceUV});
+        block.material = this.material;
 
         return block;
     }

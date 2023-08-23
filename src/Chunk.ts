@@ -30,6 +30,8 @@ export class Chunk
             underwater: Blocks.sand.start(scene, this.blockSize),
         };
 
+        let waterLevel = elevatioGenerator.getWaterLevel();
+
         for (let j = 0; j < this.chunkSize; j++) {
             for (let i = 0; i < this.chunkSize; i++) {
                 let position = new BABYLON.Vector2(
@@ -42,13 +44,13 @@ export class Chunk
 
                 let groundSpawner : BlockSpawner = biomeBlockSpawners.ground;
 
-                if (blockPosition.y < -5) {
+                if (blockPosition.y < waterLevel) {
                     groundSpawner = biomeBlockSpawners.underwater;
-                    biomeBlockSpawners.water.spawn(new BABYLON.Vector3(blockPosition.x, -5, blockPosition.z));
+                    biomeBlockSpawners.water.spawn(new BABYLON.Vector3(blockPosition.x, waterLevel, blockPosition.z));
                 }
                 groundSpawner.spawn(blockPosition.clone());
 
-                for (let k = 0; k < 3; k++) {
+                for (let k = 0; k < 2; k++) {
                     blockPosition.y -= this.blockSize;
                     biomeBlockSpawners.underground.spawn(blockPosition);
                 }

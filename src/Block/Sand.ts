@@ -3,14 +3,18 @@ import {BlockSpawner} from "./BlockSpawner";
 
 export class Sand extends BlockSpawner
 {
+    private material: BABYLON.StandardMaterial;
+
     protected getSourceBlock(scene: BABYLON.Scene, size: number): BABYLON.Mesh
     {
-        let material = new BABYLON.StandardMaterial("block_sand", scene);
-        material.diffuseTexture = new BABYLON.Texture(require('../../assets/sand.png'), scene);
-        material.freeze();
+        if (!this.material) {
+            this.material = new BABYLON.StandardMaterial("block_sand", scene);
+            this.material.diffuseTexture = new BABYLON.Texture(require('../../assets/sand.png'), scene);
+            this.material.freeze();
+        }
 
         let block = BABYLON.CreateBox('sand_block', {size});
-        block.material = material;
+        block.material = this.material;
 
         return block;
     }
