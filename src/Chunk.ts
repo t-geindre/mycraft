@@ -22,16 +22,7 @@ export class Chunk
     }
 
     public generate(scene: BABYLON.Scene, elevationGenerator: ElevationGenerator) {
-        // Biome config
-        let biomeBlockSpawners = {
-            ground: Blocks.grass.start(scene, this.blockSize),
-            underground: Blocks.dirt.start(scene, this.blockSize),
-            deepGround:  Blocks.stone.start(scene, this.blockSize),
-            water: Blocks.water.start(scene, this.blockSize),
-            underwater: Blocks.sand.start(scene, this.blockSize),
-        };
-
-
+        let biomeBlockSpawners = this.getBiomeBlockSpawners(scene);
         let waterLevel = elevationGenerator.getWaterLevel();
         elevationGenerator.clear();
 
@@ -41,7 +32,6 @@ export class Chunk
                     this.chunkPosition.x + i * this.blockSize,
                     this.chunkPosition.y + j * this.blockSize,
                 );
-
 
                 let blockPosition = elevationGenerator.getAt(position);
                 blockPosition.y = blockPosition.y * this.blockSize;
@@ -59,6 +49,7 @@ export class Chunk
 
                 let groundSpawner : BlockSpawner = biomeBlockSpawners.ground;
 
+                // Close to water, put an underwater block
                 if (blockPosition.y < waterLevel || elevationAround.some(elevation => elevation < waterLevel)) {
                     groundSpawner = biomeBlockSpawners.underwater;
                 }
@@ -69,26 +60,37 @@ export class Chunk
                 groundSpawner.spawn(blockPosition.clone());
 
                 // put underground block if elevation is going up more than 1 block
-                let elevationDiff = elevationAround.reduce((acc, elevation) => { return Math.min(acc, elevation - blockPosition.y) }, 0);
+                let elevationDiff = elevationAround.reduce(
+                    (acc, elevation) => Math.min(acc, elevation - blockPosition.y),
+                    0
+                );
 
-                if (elevationDiff < -1) {
-                    for (let k = -1; k > elevationDiff; k--) {
+                if (elevationDiff < -this.blockSize) {
+                    for (let k = -this.blockSize; k > elevationDiff; k -= this.blockSize) {
                         blockPosition.y -= this.blockSize;
-                        if (k < -3) {
-                            biomeBlockSpawners.deepGround.spawn(blockPosition);
-                            continue;
-                        }
                         biomeBlockSpawners.underground.spawn(blockPosition);
                     }
                 }
             }
         }
 
-        this.blocks.push(biomeBlockSpawners.ground.flush());
-        this.blocks.push(biomeBlockSpawners.underground.flush());
-        this.blocks.push(biomeBlockSpawners.water.flush());
-        this.blocks.push(biomeBlockSpawners.underwater.flush());
-        this.blocks.push(biomeBlockSpawners.deepGround.flush());
+        this.flushBlocks(biomeBlockSpawners);
+    }
+
+    private getBiomeBlockSpawners(scene: BABYLON.Scene) : { [key: string]: BlockSpawner } {
+        return {
+            ground: Blocks.grass.start(scene, this.blockSize),
+            underground: Blocks.dirt.start(scene, this.blockSize),
+            deepGround:  Blocks.stone.start(scene, this.blockSize),
+            water: Blocks.water.start(scene, this.blockSize),
+            underwater: Blocks.sand.start(scene, this.blockSize),
+        };
+    }
+
+    private flushBlocks(blockSpawners: { [key: string]: BlockSpawner }) {
+        Object.keys(blockSpawners).forEach(key => {
+            this.blocks.push(blockSpawners[key].flush());
+        });
     }
 
     public dispose() {

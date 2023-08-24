@@ -23,7 +23,7 @@ scene.autoClear = false;
 scene.autoClearDepthAndStencil = false;
 
 // Light
-let light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(0, 10, 0), scene);
+let light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(0, 10, 1), scene);
 
 // Skybox
 const skyMaterial = new BABYLON_MATERIALS.SkyMaterial("skyMaterial", scene);
