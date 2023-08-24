@@ -18,6 +18,8 @@ export abstract class BlockSpawner {
 
     public spawn(position: BABYLON.Vector3)
     {
+        position = position.clone();
+
         if (!this.firstPositionSet) {
             this.sourceBlock.position = position;
             this.firstPositionSet = true;
@@ -44,6 +46,8 @@ export abstract class BlockSpawner {
 
             return null;
         }
+
+        this.sourceBlock.freezeWorldMatrix();
 
         return this.sourceBlock;
     }

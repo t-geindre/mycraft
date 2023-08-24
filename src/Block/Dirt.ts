@@ -22,6 +22,7 @@ export class Dirt extends BlockSpawner
         if (!this.material) {
             this.material = new BABYLON.StandardMaterial("block_dirt", scene);
             this.material.diffuseTexture = new BABYLON.Texture(require('../../assets/grass.png'), scene);
+            this.material.specularColor = new BABYLON.Color3(0, 0, 0);
             this.material.freeze();
         }
 

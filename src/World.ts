@@ -18,14 +18,14 @@ export class World
         this.elevationGenerator = elevationGenerator;
     }
 
-    update(scene: BABYLON.Scene, camera: BABYLON.Camera) {
-        if (this.populateMissingChunks(scene, camera)) {
-            scene.blockfreeActiveMeshesAndRenderingGroups = true;
-            this.clearTooFarChunks(scene, camera);
-            scene.blockfreeActiveMeshesAndRenderingGroups = false;
-        }
-    }
+    *update(scene: BABYLON.Scene, camera: BABYLON.Camera): IterableIterator<any> {
+        this.clearTooFarChunks(scene, camera);
 
+        while (this.populateMissingChunks(scene, camera).next()) {
+            yield;
+        }
+
+    }
     clearTooFarChunks(scene: BABYLON.Scene, camera: BABYLON.Camera) {
         let cameraPosition2d = new BABYLON.Vector2(camera.position.x, camera.position.z);
         let maxDistance = this.chunkSize * this.blockSize * (this.chunkFromCamera + 1)
@@ -44,7 +44,7 @@ export class World
         });
     }
 
-    populateMissingChunks(scene: BABYLON.Scene, camera: BABYLON.Camera) {
+    *populateMissingChunks(scene: BABYLON.Scene, camera: BABYLON.Camera) : IterableIterator<any> {
         let newChunks = false;
 
         let cameraChunkPosition = new BABYLON.Vector2(
@@ -61,6 +61,7 @@ export class World
 
                 if (this.createChunk(scene, chunkPosition)) {
                     newChunks = true;
+                    yield;
                 }
             }
         }

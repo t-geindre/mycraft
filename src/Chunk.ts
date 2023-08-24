@@ -21,16 +21,19 @@ export class Chunk
         return this.chunkPosition;
     }
 
-    public generate(scene: BABYLON.Scene, elevatioGenerator: ElevationGenerator) {
+    public generate(scene: BABYLON.Scene, elevationGenerator: ElevationGenerator) {
         // Biome config
         let biomeBlockSpawners = {
             ground: Blocks.grass.start(scene, this.blockSize),
             underground: Blocks.dirt.start(scene, this.blockSize),
+            deepGround:  Blocks.stone.start(scene, this.blockSize),
             water: Blocks.water.start(scene, this.blockSize),
             underwater: Blocks.sand.start(scene, this.blockSize),
         };
 
-        let waterLevel = elevatioGenerator.getWaterLevel();
+
+        let waterLevel = elevationGenerator.getWaterLevel();
+        elevationGenerator.clear();
 
         for (let j = 0; j < this.chunkSize; j++) {
             for (let i = 0; i < this.chunkSize; i++) {
@@ -39,20 +42,44 @@ export class Chunk
                     this.chunkPosition.y + j * this.blockSize,
                 );
 
-                let blockPosition = elevatioGenerator.getAt(position);
+
+                let blockPosition = elevationGenerator.getAt(position);
                 blockPosition.y = blockPosition.y * this.blockSize;
+
+                let elevationAround = [
+                    elevationGenerator.getAt(new BABYLON.Vector2(position.x, position.y + this.blockSize)).y,
+                    elevationGenerator.getAt(new BABYLON.Vector2(position.x, position.y - this.blockSize)).y,
+                    elevationGenerator.getAt(new BABYLON.Vector2(position.x + this.blockSize, position.y + this.blockSize)).y,
+                    elevationGenerator.getAt(new BABYLON.Vector2(position.x + this.blockSize, position.y - this.blockSize)).y,
+                    elevationGenerator.getAt(new BABYLON.Vector2(position.x - this.blockSize, position.y + this.blockSize)).y,
+                    elevationGenerator.getAt(new BABYLON.Vector2(position.x - this.blockSize, position.y - this.blockSize)).y,
+                    elevationGenerator.getAt(new BABYLON.Vector2(position.x + this.blockSize, position.y)).y,
+                    elevationGenerator.getAt(new BABYLON.Vector2(position.x - this.blockSize, position.y)).y,
+                ];
 
                 let groundSpawner : BlockSpawner = biomeBlockSpawners.ground;
 
-                if (blockPosition.y < waterLevel) {
+                if (blockPosition.y < waterLevel || elevationAround.some(elevation => elevation < waterLevel)) {
                     groundSpawner = biomeBlockSpawners.underwater;
+                }
+
+                if (blockPosition.y < waterLevel) {
                     biomeBlockSpawners.water.spawn(new BABYLON.Vector3(blockPosition.x, waterLevel, blockPosition.z));
                 }
                 groundSpawner.spawn(blockPosition.clone());
 
-                for (let k = 0; k < 2; k++) {
-                    blockPosition.y -= this.blockSize;
-                    biomeBlockSpawners.underground.spawn(blockPosition);
+                // put underground block if elevation is going up more than 1 block
+                let elevationDiff = elevationAround.reduce((acc, elevation) => { return Math.min(acc, elevation - blockPosition.y) }, 0);
+
+                if (elevationDiff < -1) {
+                    for (let k = -1; k > elevationDiff; k--) {
+                        blockPosition.y -= this.blockSize;
+                        if (k < -3) {
+                            biomeBlockSpawners.deepGround.spawn(blockPosition);
+                            continue;
+                        }
+                        biomeBlockSpawners.underground.spawn(blockPosition);
+                    }
                 }
             }
         }
@@ -61,6 +88,7 @@ export class Chunk
         this.blocks.push(biomeBlockSpawners.underground.flush());
         this.blocks.push(biomeBlockSpawners.water.flush());
         this.blocks.push(biomeBlockSpawners.underwater.flush());
+        this.blocks.push(biomeBlockSpawners.deepGround.flush());
     }
 
     public dispose() {
